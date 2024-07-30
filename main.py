@@ -5,6 +5,7 @@ from copenai import copenai
 import yaml
 from dotenv import load_dotenv
 import os
+import pprint
 
 # Load the .env file
 load_dotenv()
@@ -28,7 +29,7 @@ def run_bash_command(command):
 def extract_new_code_from_git_diff(absolute_path):
     try:
         # Generate the git diff output
-        command = "cd " + absolute_path + " && git diff"
+        command = "cd " + absolute_path + " && git diff HEAD~1 HEAD -U5"
         diff_output = run_bash_command(command)
 
         # Filter new code lines and clean them
@@ -59,7 +60,10 @@ def process(absolute_path):
         code_changes_string = code_changes_string + line + "\n"
 
     code_changes_map[file_name] = code_changes_string
-    print(code_changes_map)
+
+    pp = pprint.PrettyPrinter(indent=4)
+    pp.pprint(code_changes_map)
+    # print(code_changes_map)
     return code_changes_map
 
 def parse_config(config_file):
@@ -76,11 +80,14 @@ def pr_review():
     absolute_path = config['path']['location']
     print("Absolute Path " + absolute_path)
     code_changes_map = process(absolute_path)
-    # sys.exit(1)
+    sys.exit(1)
     for k, v in code_changes_map.items():
         print("Filename", k)
         print("Changes", v)
-        copenai.suggest_changes(v)
+        if "pkg/pb" not in k:
+            copenai.suggest_changes(v)
+        else:
+            print("Skipping proto files")
 
 
 

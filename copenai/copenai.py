@@ -6,7 +6,7 @@ def suggest_changes(message):
     openai.api_key=os.environ['OPENAI_KEY']
 
     messages = [ {"role": "system", "content":
-                  "You are a code reviewer, reviewing code changes and suggesting changes as per best practices."} ]
+                  "You are a code reviewer, reviewing code changes and suggesting changes as per best practices. The code shared will be Golang code."} ]
     # message = input("User : ")
     message = "Can you suggest changes in the below code snippet? \n" + message
     if message:
